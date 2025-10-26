@@ -21,6 +21,8 @@ jobs:
     uses: NixLine-org/.github/.github/workflows/nixline-sbom.yml@stable
 
   flake_update:
+    # Disabled: This demo repo doesn't have a flake.nix (shows NixLine works in non-flake repos)
+    if: false
     # Allow writes only for this job
     permissions:
       contents: write

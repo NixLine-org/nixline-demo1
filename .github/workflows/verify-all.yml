@@ -1,0 +1,31 @@
+name: Verify All NixLine Workflows
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+
+jobs:
+  ci:
+    uses: NixLine-org/.github/.github/workflows/nixline-ci.yml@stable
+    with:
+      channel: stable
+      packs: gh-actions,precommit,editorconfig,codeowners,security,license,sbom,dependabot,flake-update
+      sync_mode: ephemeral
+
+  sbom:
+    uses: NixLine-org/.github/.github/workflows/nixline-sbom.yml@stable
+
+  flake_update:
+    uses: NixLine-org/.github/.github/workflows/nixline-flake-update.yml@stable
+    with:
+      pr-title: "chore(nix): verify flake update"
+      pr-labels: "test, nix"
+
+  dependabot_automerge:
+    uses: NixLine-org/.github/.github/workflows/nixline-dependabot-automerge.yml@stable
+    with:
+      allow_minor_patch: "true"
+      allow_security_updates: "true"
+
+  policy_check:
+    uses: NixLine-org/.github/.github/workflows/nixline-policy-flake-lock-only.yml@stable

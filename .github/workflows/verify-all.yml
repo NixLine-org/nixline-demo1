@@ -40,4 +40,5 @@ jobs:
       allow_security_updates: "true"
 
   policy_check:
+    if: github.event_name == 'pull_request'
     uses: NixLine-org/.github/.github/workflows/nixline-policy-flake-lock-only.yml@stable

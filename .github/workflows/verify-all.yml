@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
 
+# Default: read-only for all jobs
+permissions:
+  contents: read
+  pull-requests: none
+
 jobs:
   ci:
     uses: NixLine-org/.github/.github/workflows/nixline-ci.yml@stable
@@ -16,6 +21,10 @@ jobs:
     uses: NixLine-org/.github/.github/workflows/nixline-sbom.yml@stable
 
   flake_update:
+    # Allow writes only for this job
+    permissions:
+      contents: write
+      pull-requests: write
     uses: NixLine-org/.github/.github/workflows/nixline-flake-update.yml@stable
     with:
       pr-title: "chore(nix): verify flake update"

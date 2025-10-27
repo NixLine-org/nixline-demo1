@@ -1,9 +1,12 @@
-name: Demo CI (ephemeral)
+name: CI
+
 on: [push, pull_request]
+
 jobs:
-  ci:
-    uses: NixLine-org/.github/.github/workflows/nixline-ci.yml@stable
-    with:
-      channel: stable
-      packs: gh-actions,precommit,editorconfig,codeowners,security,license,sbom,dependabot,flake-update
-      sync_mode: ephemeral
+  policy-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v24
+      - name: Verify policies are in sync
+        run: nix run .#check

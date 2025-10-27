@@ -1,97 +1,75 @@
-# NixLine Demo 1
+# NixLine Demo Repository
 
-This repository demonstrates how **[NixLine](https://github.com/NixLine-org/nixline)** keeps repositories aligned with organization-wide policies — automatically, reproducibly and securely.
+This repository demonstrates how **[NixLine](https://github.com/NixLine-org/nixline-baseline)** keeps repositories aligned with organization-wide policies automatically, reproducibly and securely.
 
-**NixLine Demo 1** is a minimal example repository that demonstrates how an organization can adopt NixLine’s architecture.  
-It consumes reusable workflows from `NixLine-org/.github` and baseline logic from `NixLine-org/nixline-baseline`, showing how CI enforcement, policy checks and dependency automation can all be centralized through declarative Nix.
+**NixLine Demo** is a consumer example showing how organizations can adopt NixLine's architecture for:
+- **Policy materialization** - Sync `.editorconfig`, `LICENSE`, `SECURITY.md`, `CODEOWNERS` and more
+- **Automated policy sync** - Weekly sync keeps policies up to date
+- **CI validation** - Ensure policies stay in sync
 
+It consumes reusable workflows from [`NixLine-org/.github`](https://github.com/NixLine-org/.github) and baseline logic from [`NixLine-org/nixline-baseline`](https://github.com/NixLine-org/nixline-baseline).
 
-## Demo Overview
+## Quick Start
 
-This repo is a **consumer** of the NixLine ecosystem. It shows how a typical project in the org would integrate:
+This demo repository shows NixLine in action. To set up your own consumer repository, see the [NixLine Baseline Quick Start](https://github.com/NixLine-org/nixline-baseline#quick-start-for-consumer-repos) guide.
 
-- The shared workflows stored in `NixLine-org/.github`
-- The shared baseline logic stored in `NixLine-org/nixline-baseline`
-- The CI validation that ensures compliance with org standards
+**Note:** This repository's CI initially fails because the policy files haven't been materialized yet. This is expected behavior for new consumer repositories. Run `nix run .#sync` to fix.
 
-## Important Concepts
+## How It Works
 
-### Baseline Repository  
+This repository uses the **consumer template** pattern:
 
-[`NixLine-org/nixline-baseline`](https://github.com/NixLine-org/nixline-baseline)  
+- **`flake.nix`** - References the baseline and configures which packs to enable
+- **`.github/workflows/policy-sync.yml`** - Runs weekly to sync policy updates
+- **`.github/workflows/ci.yml`** - Validates policies are in sync on every push
 
-- Contains the canonical definitions used by workflows (e.g., apps `#sync` and `#check`).  
-- Tag `stable` is used by workflows across the org for predictable behavior.
-
-### Demo Repository  
-
-This repository (`nixline-demo1`):  
-
-Is a real-world style consumer project that uses the baseline and workflows.  
-
-- Does *not* manage the baseline itself.  
-- Runs a CI job that executes the baseline logic.
-
-## Included Packs
-
-GitHub Actions, Pre-commit, EditorConfig, CODEOWNERS, Security policy, License, SBOM, Dependabot, Flake updater
-
-## CI Workflow
-
-This project includes the following workflow(s) under `.github/workflows`:
-
-- **[`.github/workflows/ci.yml`](.github/workflows/ci.yml)** — runs the `Demo CI (ephemeral)` workflow.  
-  This workflow executes:
-
-  ```bash
-  nix run github:NixLine-org/nixline-baseline?ref=stable#sync
-  nix run github:NixLine-org/nixline-baseline?ref=stable#check
-  ```
-
-Which means: use the baseline’s logic (tag `stable`) to perform sync/check.
-
-- **[`.github/workflows/verify-all.yml`](.github/workflows/verify-all.yml)** — (optional) a manual or push-triggered workflow that runs all NixLine reusable workflows (CI, SBOM, flake-update, etc.) for demonstration and verification purposes.
-
-## How to Run Locally
-
-You don’t need to manage or modify the baseline logic in this repo. To validate the setup locally:
+## Available Apps
 
 ```bash
-# Run baseline sync
-nix run github:NixLine-org/nixline-baseline?ref=stable#sync
+# Sync policies from baseline
+nix run .#sync
 
-# Run baseline check
-nix run github:NixLine-org/nixline-baseline?ref=stable#check
+# Check if policies are in sync
+nix run .#check
+
+# Generate SBOM (after sync)
+nix run .#sbom
+
+# Update flake.lock with PR
+nix run .#flake-update
+
+# Install pre-commit hooks
+nix run .#setup-hooks
 ```
 
-If both commands output `Hello, world!` (or equivalent), the baseline is working and the demo CI uses it correctly.
+## Enabled Packs
 
----
+This demo repository enables these packs in `flake.nix`:
+
+| Pack | Purpose | Materialized File |
+|------|---------|-------------------|
+| `editorconfig` | Code formatting standards | `.editorconfig` |
+| `license` | Apache 2.0 license | `LICENSE` |
+| `security` | Security policy | `SECURITY.md` |
+| `codeowners` | Code ownership rules | `.github/CODEOWNERS` |
+| `precommit` | Pre-commit hooks | `.pre-commit-config.yaml` |
+| `dependabot` | Dependabot config | `.github/dependabot.yml` |
+
+## Automated Policy Sync
+
+The repository includes a weekly policy sync workflow that:
+
+1. Checks if policies are out of sync with baseline
+2. If needed, materializes updated policies
+3. Auto-commits changes directly to main branch
+
+This ensures the repository stays up to date with organization policies without manual intervention.
 
 ## Why This Architecture?
 
-- **Separation of Concerns**  
+- **Separation of Concerns** - The baseline defines policies, consumers just use them
+- **Scalability** - One baseline update propagates to all consumer repositories automatically
+- **No PR Bottleneck** - Policy updates materialize instantly without requiring manual review
+- **Reproducible** - All policy content is defined declaratively in Nix
 
-  The [baseline repository](https://github.com/NixLine-org/nixline-baseline) is owned by the organization and defines shared logic and policy.  
-  Consumer repositories (like this demo) simply *use* the baseline — they don’t need to re-implement or duplicate its logic.
-
-- **Scalability**  
-
-  A single baseline repo can power dozens or hundreds of consumer repos.  
-  When policies or configurations are updated in the baseline, every consumer automatically inherits those changes through the shared workflows.
-
-- **Clarity**  
-
-  This setup works like a **library–client** model:  
-  - The baseline provides reusable, versioned Nix modules and workflows.  
-  - Consumer repos reference them declaratively.
-
-- **Reusability Across Organizations**  
-
-  Any organization can adopt this pattern by **forking** or **mirroring** the NixLine repositories:  
-  
-  1. Fork [`NixLine-org/.github`](https://github.com/NixLine-org/.github) for reusable workflows.  
-  2. Fork [`NixLine-org/nixline-baseline`](https://github.com/NixLine-org/nixline-baseline) to define your own policies and baseline logic.  
-  3. Add the `ci.yml` (and optionally `verify-all.yml`) workflow to your repos to start enforcing consistent CI behavior.
-
-This architecture makes it easy for engineering or security teams to build their own **organization-wide governance layer** — one that automates policy inheritance, dependency updates and security enforcement in a reproducible and transparent way.
+For organizations, this eliminates the traditional governance bottleneck where policy updates require hundreds of manual PRs across repositories.

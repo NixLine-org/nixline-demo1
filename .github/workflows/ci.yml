@@ -3,10 +3,9 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  policy-check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: cachix/install-nix-action@v24
-      - name: Verify policies are in sync
-        run: nix run 'github:NixLine-org/nixline-baseline?ref=stable'#check
+  nixline-ci:
+    uses: NixLine-org/.github/.github/workflows/nixline-ci.yml@stable
+    with:
+      channel: stable
+      # Customize packs - exclude security for demo purposes
+      packs: "editorconfig,codeowners,license,precommit,dependabot"

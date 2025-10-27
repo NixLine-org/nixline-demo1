@@ -9,4 +9,4 @@ jobs:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v24
       - name: Verify policies are in sync
-        run: nix run github:NixLine-org/nixline-baseline#check
+        run: nix run 'github:NixLine-org/nixline-baseline?ref=stable'#check

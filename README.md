@@ -32,17 +32,14 @@ nix run github:NixLine-org/nixline-baseline#sync
 # Check if policies are in sync
 nix run github:NixLine-org/nixline-baseline#check
 
-# Generate SBOM
-nix run github:NixLine-org/nixline-baseline#sbom
-
-# Update flake.lock with PR
-nix run github:NixLine-org/nixline-baseline#flake-update
-
-# Install pre-commit hooks
-nix run github:NixLine-org/nixline-baseline#setup-hooks
-
 # Create new policy pack
 nix run github:NixLine-org/nixline-baseline#create-pack <name>
+
+# Import existing policy files
+nix run github:NixLine-org/nixline-baseline#import-policy -- --auto
+
+# Fetch license from SPDX
+nix run github:NixLine-org/nixline-baseline#fetch-license -- Apache-2.0 --holder "My Company"
 ```
 
 ## Materialized Packs

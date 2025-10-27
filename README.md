@@ -13,38 +13,41 @@ It consumes reusable workflows from [`NixLine-org/.github`](https://github.com/N
 
 This demo repository shows NixLine in action. To set up your own consumer repository, see the [NixLine Baseline Quick Start](https://github.com/NixLine-org/nixline-baseline#quick-start-for-consumer-repos) guide.
 
-**Note:** This repository's CI initially fails because the policy files haven't been materialized yet. This is expected behavior for new consumer repositories. Run `nix run .#sync` to fix.
+**Note:** This repository's CI initially fails because the policy files haven't been materialized yet. This is expected behavior for new consumer repositories. Run `nix run github:NixLine-org/nixline-baseline#sync` to fix.
 
 ## How It Works
 
-This repository uses the **consumer template** pattern:
+This repository demonstrates the **direct consumption** pattern:
 
-- **`flake.nix`** - References the baseline and configures which packs to enable
+- **Direct baseline calls** - Uses `nix run github:NixLine-org/nixline-baseline#command`
 - **`.github/workflows/policy-sync.yml`** - Runs weekly to sync policy updates
 - **`.github/workflows/ci.yml`** - Validates policies are in sync on every push
 
-## Available Apps
+## Available Commands
 
 ```bash
 # Sync policies from baseline
-nix run .#sync
+nix run github:NixLine-org/nixline-baseline#sync
 
 # Check if policies are in sync
-nix run .#check
+nix run github:NixLine-org/nixline-baseline#check
 
-# Generate SBOM (after sync)
-nix run .#sbom
+# Generate SBOM
+nix run github:NixLine-org/nixline-baseline#sbom
 
 # Update flake.lock with PR
-nix run .#flake-update
+nix run github:NixLine-org/nixline-baseline#flake-update
 
 # Install pre-commit hooks
-nix run .#setup-hooks
+nix run github:NixLine-org/nixline-baseline#setup-hooks
+
+# Create new policy pack
+nix run github:NixLine-org/nixline-baseline#create-pack <name>
 ```
 
-## Enabled Packs
+## Materialized Packs
 
-This demo repository enables these packs in `flake.nix`:
+This demo repository materializes these packs by default:
 
 | Pack | Purpose | Materialized File |
 |------|---------|-------------------|

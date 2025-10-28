@@ -1,13 +1,15 @@
 # NixLine Demo Repository
 
-This repository demonstrates how **[NixLine](https://github.com/NixLine-org/nixline-baseline)** keeps repositories aligned with organization-wide policies automatically, reproducibly and securely.
+Demonstrates **direct consumption** of [NixLine](https://github.com/NixLine-org/nixline-baseline) for organization-wide policy enforcement using default policies.
 
-**NixLine Demo** is a consumer example showing how organizations can adopt NixLine's architecture for:
-- **Policy materialization** - Sync `.editorconfig`, `LICENSE`, `SECURITY.md`, `CODEOWNERS` and more
-- **Automated policy sync** - Weekly sync keeps policies up to date
-- **CI validation** - Ensure policies stay in sync
+Shows how consumer repositories can:
+- Call baseline directly via `nix run github:ORG/baseline#sync`
+- Use default NixLine policies without configuration
+- Validate policies automatically in CI
+- Sync policy updates weekly without manual intervention
+- Optionally add configuration for organization branding
 
-It consumes reusable workflows from [`NixLine-org/.github`](https://github.com/NixLine-org/.github) and baseline logic from [`NixLine-org/nixline-baseline`](https://github.com/NixLine-org/nixline-baseline).
+Uses reusable workflows from [`NixLine-org/.github`](https://github.com/NixLine-org/.github) and policy definitions from [`NixLine-org/nixline-baseline`](https://github.com/NixLine-org/nixline-baseline).
 
 ## Quick Start
 
@@ -26,11 +28,20 @@ This repository demonstrates the **direct consumption** pattern:
 ## Available Commands
 
 ```bash
-# Sync policies from baseline
+# Sync default policies from baseline
 nix run github:NixLine-org/nixline-baseline#sync
 
 # Check if policies are in sync
 nix run github:NixLine-org/nixline-baseline#check
+
+# Preview changes without applying
+nix run github:NixLine-org/nixline-baseline#sync -- --dry-run
+
+# Select specific packs
+nix run github:NixLine-org/nixline-baseline#sync -- --packs editorconfig,license,codeowners
+
+# Override organization name (temporary customization)
+nix run github:NixLine-org/nixline-baseline#sync -- --override org.name=MyCompany
 
 # Create new policy pack
 nix run github:NixLine-org/nixline-baseline#create-pack <name>
@@ -64,6 +75,30 @@ The repository includes a weekly policy sync workflow that:
 3. Auto-commits changes directly to main branch
 
 This ensures the repository stays up to date with organization policies without manual intervention.
+
+## Organization Branding (Optional)
+
+While this demo uses default policies, organizations can add branding via configuration:
+
+**Create `.nixline.toml`:**
+```toml
+[organization]
+name = "MyCompany"
+security_email = "security@mycompany.com"
+default_team = "@MyCompany/maintainers"
+
+[packs]
+enabled = ["editorconfig", "license", "codeowners"]
+```
+
+**Sync with configuration:**
+```bash
+nix run github:NixLine-org/nixline-baseline#sync -- --config .nixline.toml
+```
+
+This provides organization-specific branding (company name in CODEOWNERS, security email in SECURITY.md) without requiring baseline forking.
+
+See [nixline-demo2](https://github.com/NixLine-org/nixline-demo2) for a complete configuration-driven example.
 
 ## Why This Architecture?
 

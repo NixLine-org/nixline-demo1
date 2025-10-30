@@ -1,0 +1,19 @@
+name: Auto Approve Policy Updates
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  auto-approve:
+    uses: NixLine-org/.github/.github/workflows/nixline-auto-approve.yml@stable
+    with:
+      pr_title_pattern: "Policy Sync"
+      actor_filter: "github-actions[bot]"
+      merge_method: "squash"
+      enable_auto_merge: true
+      require_checks: true

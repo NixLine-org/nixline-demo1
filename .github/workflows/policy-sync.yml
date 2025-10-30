@@ -10,12 +10,16 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
   issues: write
 
 jobs:
   sync:
-    uses: NixLine-org/.github/.github/workflows/nixline-policy-sync.yml@stable
+    uses: NixLine-org/.github/.github/workflows/nixline-policy-sync-smart.yml@stable
     with:
       consumption_pattern: direct
       baseline_repo: NixLine-org/nixline-baseline
-      baseline_ref: stable
+      baseline_ref: main
+      prefer_pr: false         # Try direct push first
+      auto_merge: true         # Enable auto-merge if PR created
+      stagger_minutes: 5       # Random delay to prevent rate limits

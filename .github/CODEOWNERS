@@ -1,5 +1,11 @@
 # CODEOWNERS - Generated from nixline-baseline
-# Edit packs/codeowners.nix in your baseline to customize
+# Organization: NixLine-org
+# Default Team: @NixLine-org/maintainers
+#
+# This file is auto-generated. To customize:
+# 1. Add a .nixline.toml file to your repository root
+# 2. Define [packs.codeowners] section with custom rules
+# 3. Run: nix run github:NixLine-org/nixline-baseline#sync
 
 # Default owners for everything
 * @NixLine-org/maintainers
@@ -10,8 +16,7 @@
 flake.lock @NixLine-org/nix-team
 
 # CI/CD workflows
-.github/workflows/ @NixLine-org/devops
+.github/workflows/** @NixLine-org/devops
 
 # Documentation
 *.md @NixLine-org/docs
-
